@@ -48,7 +48,7 @@ def get_data_ibk(result_list):
     '''
     patterns = {
         "Total": re.compile(r"(?:[\/I])\s?(\d{1,3}(?:,\d{3})*)(?:\.\d{2})"),  # Patrón para moneda S/
-        "Numero tarjeta": re.compile(r"\*{3,}\d{3,4}$"),
+        "Numero tarjeta": re.compile(r"CUENTA CARGO"),
         "DNI": re.compile(r"DATOS"),
         "Codigo de operacion": re.compile(r"DIGO DE\s+\d*")
     }
@@ -63,7 +63,11 @@ def get_data_ibk(result_list):
                     total_str = match.group(0).replace("/", "").replace("I", "").replace(",", "")
                     matches_dict[key] = float(total_str)
                 elif key == "Numero tarjeta":
-                    matches_dict[key] = re.sub("\D", "", text[-4:])
+                    for item in result_list[index+1:index+4]:
+                        last_three = item.strip()[-3:]
+                        if last_three.isdigit():
+                            matches_dict[key] = re.sub("\D", "", item[-4:])
+                            break
                 elif key == "DNI":
                     matches_dict[key] = re.sub("\D", "", result_list[index + 2])
                 elif key == "Codigo de operacion":
