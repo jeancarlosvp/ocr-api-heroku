@@ -74,10 +74,10 @@ def send_data_to_gs(matches_dict):
                 json=dict_translate
             )
             if response.status_code == 201:
-                return response.json()
+                return {"message":response.json(), "data":matches_dict}
             else:
-                return response.json()
+                return {"message":response.json(), "data":matches_dict}
         else:
-            return {"detail":"No fue enviado a GS, revisar SEND_GS"}
+            return {"detail":"No fue enviado a GS, revisar SEND_GS", "data":matches_dict}
     except Exception as e:
         return {"detail":str(e)}
