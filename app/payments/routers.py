@@ -18,6 +18,7 @@ async def send_file_payment(file:Union[UploadFile, None], request: Request):
         selection = select_bank(result_list)
         print(f"selection: {selection}")
         matches_dict = get_bank_data(selection, result_list)
+        print (f"matches_dict: {matches_dict}")
         if matches_dict:
             return send_data_to_gs(matches_dict)
         else:

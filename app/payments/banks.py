@@ -13,11 +13,7 @@ def get_data_bcp(result_list):
 
     matches_dict = {
         "Banco": 1,
-        "Total": "",
-        "Numero tarjeta": "",
-        "DNI": "",
-        "Codigo de operacion": ""
-
+        "Total": None
     }
 
     for index in range(len(result_list)):
@@ -29,7 +25,6 @@ def get_data_bcp(result_list):
                     total_str = match.group(0).replace("/", "").replace("I", "").replace(",", "")
                     matches_dict[key] = float(total_str)
                 elif key == "Numero tarjeta":
-                    print(text)
                     four_last = result_list[index][-4:]
                     matches_dict[key] = re.sub("\D", "", four_last)
                 elif key == "DNI":
@@ -59,15 +54,42 @@ def get_data_ibk(result_list):
         "Codigo de operacion": re.compile(r"DIGO DE\s+\d*")
     }
 
-    matches_dict = {
-        "Banco": 2,
-        "Total": "",
-        "Numero tarjeta": "",
-        "DNI": "",
-        "Codigo de operacion": ""
-            
+    matches_dict = {"Banco": 2}
+    print(f"result_list: {result_list}")
+    for index in range(len(result_list)):
+        for key, pattern in patterns.items():
+            text = result_list[index]
+            match = pattern.search(text)
+            if match:
+                print(f"match: {match}")
+                print(f"texto: {text}")
+                if key == "Total":
+                    print(f"total: {match.group(0)}")
+                    total_str = match.group(0).replace("/", "").replace("I", "").replace(",", "")
+                    matches_dict[key] = float(total_str)
+                elif key == "Numero tarjeta":
+                    print(f"tarjeta: {text}")
+                    matches_dict[key] = re.sub("\D", "", text[-4:])
+                elif key == "DNI":
+                    print(f"DNI: {text}")
+                    matches_dict[key] = re.sub("\D", "", result_list[index + 2])
+                elif key == "Codigo de operacion":
+                    print(f"codigo: {text}")
+                    matches_dict[key] = re.sub("\D", "", result_list[index + 1])
+                break
+
+    return matches_dict
+
+def get_data_bbva(result_list):
+    '''
+    Get data from bbva
+    '''
+    patterns = {
+        "Total": re.compile(r"(?:[\/I])\s?(\d{1,3}(?:,\d{3})*)(?:\.\d{2})"),  # Patrón para moneda S/
+        "Numero tarjeta": re.compile(r"TARJETA DE ORIGEN")
     }
 
+    matches_dict = {"Banco": 3}
     for text in result_list:
         for key, pattern in patterns.items():
             match = pattern.search(text)
@@ -76,11 +98,8 @@ def get_data_ibk(result_list):
                     total_str = match.group(0).replace("/", "").replace("I", "").replace(",", "")
                     matches_dict[key] = float(total_str)
                 elif key == "Numero tarjeta":
-                    matches_dict[key] = re.sub("\D", "", text[-4:])
-                elif key == "DNI":
-                    matches_dict[key] = text[-8:]
-                elif key == "Codigo de operacion":
-                    matches_dict[key] = re.findall(r'\d+', text[-28:])[0]
+                    text = result_list[result_list.index(text) + 1]
+                    matches_dict[key] = re.sub("\D", "", text)
                 break
 
     return matches_dict
@@ -96,13 +115,7 @@ def get_data_scotiabank(result_list):
         "DNI": re.compile(r"DNI")
     }
 
-    matches_dict = {
-        "Banco": 4,
-        "Total": "",
-        "Numero tarjeta": "",
-        "DNI": "",
-        "Codigo de operacion": ""
-    }
+    matches_dict = {"Banco": 4}
 
     for text in result_list:
         for key, pattern in patterns.items():
@@ -130,14 +143,7 @@ def get_data_banbif(result_list):
         "DNI": re.compile(r"DOCUMENT")
     }
 
-    matches_dict = {
-        "Banco": 5,
-        "Total": "",
-        "Numero tarjeta": "",
-        "DNI": "",
-        "Codigo de operacion": ""
-            
-    }
+    matches_dict = {"Banco": 5}
 
     for text in result_list:
         for key, pattern in patterns.items():
@@ -147,37 +153,6 @@ def get_data_banbif(result_list):
                     total_str = match.group(0).replace("/", "").replace("I", "").replace(",", "")
                     matches_dict[key] = float(total_str)
                 elif key == "DNI":
-                    matches_dict[key] = re.sub("\D", "", text)
-                break
-
-    return matches_dict 
-
-def get_data_bbva(result_list):
-    '''
-    Get data from bbva
-    '''
-    patterns = {
-        "Total": re.compile(r"(?:[\/I])\s?(\d{1,3}(?:,\d{3})*)(?:\.\d{2})"),  # Patrón para moneda S/
-        "Numero tarjeta": re.compile(r"TARJETA DE ORIGEN")
-    }
-
-    matches_dict = {
-        "Banco": 3,
-        "Total": "",
-        "Numero tarjeta": "",
-        "DNI": "",
-        "Codigo de operacion": ""
-            
-    }
-    for text in result_list:
-        for key, pattern in patterns.items():
-            match = pattern.search(text)
-            if match:
-                if key == "Total":
-                    total_str = match.group(0).replace("/", "").replace("I", "").replace(",", "")
-                    matches_dict[key] = float(total_str)
-                elif key == "Numero tarjeta":
-                    text = result_list[result_list.index(text) + 1]
                     matches_dict[key] = re.sub("\D", "", text)
                 break
 
