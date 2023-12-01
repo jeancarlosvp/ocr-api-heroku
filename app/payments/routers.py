@@ -22,6 +22,6 @@ async def send_file_payment(file:Union[UploadFile, None], request: Request):
         if matches_dict:
             return send_data_to_gs(matches_dict)
         else:
-            return {"detail":"Error procesando la imagen"}
+            return {"detail":"Error procesando la imagen", "data":matches_dict}
     except Exception as e:
         return {"detail":str(e)}

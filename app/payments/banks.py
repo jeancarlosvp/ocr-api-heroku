@@ -34,7 +34,6 @@ def get_data_bcp(result_list):
                             matches_dict[key] = eight_last
                             break
                 elif key == "Codigo de operacion":
-                    print(text)
                     operation_code = re.sub("\D", "", result_list[index + 1])
                     matches_dict[key] = operation_code
                 break
@@ -55,26 +54,19 @@ def get_data_ibk(result_list):
     }
 
     matches_dict = {"Banco": 2}
-    print(f"result_list: {result_list}")
     for index in range(len(result_list)):
         for key, pattern in patterns.items():
             text = result_list[index]
             match = pattern.search(text)
             if match:
-                print(f"match: {match}")
-                print(f"texto: {text}")
                 if key == "Total":
-                    print(f"total: {match.group(0)}")
                     total_str = match.group(0).replace("/", "").replace("I", "").replace(",", "")
                     matches_dict[key] = float(total_str)
                 elif key == "Numero tarjeta":
-                    print(f"tarjeta: {text}")
                     matches_dict[key] = re.sub("\D", "", text[-4:])
                 elif key == "DNI":
-                    print(f"DNI: {text}")
                     matches_dict[key] = re.sub("\D", "", result_list[index + 2])
                 elif key == "Codigo de operacion":
-                    print(f"codigo: {text}")
                     matches_dict[key] = re.sub("\D", "", result_list[index + 1])
                 break
 
